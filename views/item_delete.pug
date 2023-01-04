@@ -1,0 +1,10 @@
+extends layout 
+
+block content 
+    h1= `Delete ${item.name}`
+    h3 Do you really want to delete this item?
+    form(method='POST' action='')
+      div.form-group
+        input(type='hidden',name='itemid', required='true', value=item._id, id = "itemid" )
+      button(type="submit") Yes 
+      a(href="/inventory/items/") No

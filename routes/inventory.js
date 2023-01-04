@@ -14,6 +14,10 @@ router.get("/item/new", itemController.ItemFormGet);
 router.post("/item/new", itemController.ItemFormPost);
 //Directs to the page which displays individual item details
 router.get("/item/:ID", itemController.ItemDetails);
+// Directs to the delete page of item.
+router.get("/item/:ID/delete", itemController.ItemDeleteGet);
+//Deletes the item
+router.post("/item/:ID/delete", itemController.ItemDeletePost);
 //Direct to the create category form page
 router.get("/category/new", categoryController.CategoryFormGet);
 // Add the new category

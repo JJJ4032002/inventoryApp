@@ -104,3 +104,21 @@ exports.ItemFormPost = [
     });
   },
 ];
+
+exports.ItemDeleteGet = function (req, res, next) {
+  itemModel.findById(req.params.ID).exec(function (err, item) {
+    if (err) {
+      return next(err);
+    }
+    res.render("item_delete", { item: item });
+  });
+};
+
+exports.ItemDeletePost = function (req, res, next) {
+  itemModel.findByIdAndRemove(req.body.itemid).exec(function (err, item) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/inventory/items");
+  });
+};
