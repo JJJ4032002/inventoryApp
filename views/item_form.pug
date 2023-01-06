@@ -21,7 +21,7 @@ block content
         select(name="category", id = "category", placeholder = "Please select a category", required)
            - categories.sort(function(a,b) {return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;})
              for category in categories
-                if book
+                if item
                     option(value= category._id, selected = (category._id.toString() ===                 
                      item.category._id.toString() || category._id.toString() == item.category ? "selected" : 
                       false) )= category.name  

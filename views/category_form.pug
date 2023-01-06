@@ -5,7 +5,7 @@ block content
  form(action="", method="post")
   .formGroup 
     label(for= "name") Enter the Category 
-    input(name = "name", id = "name", value = `${category === undefined ? "" : name}`, type = text, required) 
+    input(name = "name", id = "name", value = `${category === undefined ? "" : category.name}`, type = text, required) 
   .formGroup 
     label(for= "description") Enter the Description 
     textarea(cols="50", rows="5",name = "description", id = "description", required)= category === undefined ? "" : category.description

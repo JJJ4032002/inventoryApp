@@ -14,10 +14,22 @@ router.get("/item/new", itemController.ItemFormGet);
 router.post("/item/new", itemController.ItemFormPost);
 //Directs to the page which displays individual item details
 router.get("/item/:ID", itemController.ItemDetails);
+//Directs to item update page
+router.get("/item/:ID/update", itemController.ItemUpdateGet);
+//Updates an item
+router.post("/item/:ID/update", itemController.ItemUpdatePost);
 // Directs to the delete page of item.
 router.get("/item/:ID/delete", itemController.ItemDeleteGet);
 //Deletes the item
 router.post("/item/:ID/delete", itemController.ItemDeletePost);
+//Directs to the update category page
+router.get("/category/:ID/update", categoryController.CategoryUpdateGet);
+//updates the category
+router.post("/category/:ID/update", categoryController.CategoryUpdatePost);
+//Directs to the delete page of the category
+router.get("/category/:ID/delete", categoryController.CategoryDeleteGet);
+//Deletes the category
+router.post("/category/:ID/delete", categoryController.CategoryDeletePost);
 //Direct to the create category form page
 router.get("/category/new", categoryController.CategoryFormGet);
 // Add the new category

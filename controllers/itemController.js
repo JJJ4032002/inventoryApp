@@ -71,7 +71,7 @@ exports.ItemFormPost = [
     .escape()
     .isFloat({ min: 1 })
     .withMessage("Price cannot be 0 for an item"),
-  body("numberInStock")
+  body("numberinstock")
     .trim()
     .escape()
     .isFloat({ min: 0 })
@@ -80,6 +80,9 @@ exports.ItemFormPost = [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       categoryModel.find({}).exec(function (err, categories) {
+        if (err) {
+          return next(err);
+        }
         res.render("item_form", {
           title: "Create an Item",
           item: req.body,
@@ -122,3 +125,102 @@ exports.ItemDeletePost = function (req, res, next) {
     res.redirect("/inventory/items");
   });
 };
+
+exports.ItemUpdateGet = function (req, res, next) {
+  async.parallel(
+    {
+      item: function (callback) {
+        itemModel
+          .findById(req.params.ID)
+          .populate("category")
+          .exec((err, item) => {
+            if (err) {
+              return next(err);
+            }
+            callback(null, item);
+          });
+      },
+      categories: function (callback) {
+        categoryModel.find({}).exec((err, categories) => {
+          if (err) {
+            return next(err);
+          }
+          callback(null, categories);
+        });
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      console.log(results.item.category._id.toString());
+      res.render("item_form", {
+        title: "Update Item",
+        item: results.item,
+        categories: results.categories,
+      });
+    }
+  );
+};
+
+exports.ItemUpdatePost = [
+  body("name")
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage("Item Name must be specified")
+    .isAlphanumeric()
+    .withMessage("Item Name should not be alphanumeric"),
+  body("description")
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage("Description must not be empty"),
+  body("price")
+    .trim()
+    .escape()
+    .isFloat({ min: 1 })
+    .withMessage("Price cannot be 0 for an item"),
+  body("numberinstock")
+    .trim()
+    .escape()
+    .isFloat({ min: 0 })
+    .withMessage("The number of items present in stock cannot be less than 0"),
+  function (req, res, next) {
+    const errors = validationResult(req);
+    let newItem = new itemModel({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      numberinstock: req.body.numberinstock,
+      category: req.body.category,
+      _id: req.params.ID,
+    });
+    if (!errors.isEmpty()) {
+      categoryModel.find({}).exec(function (err, categories) {
+        if (err) {
+          return next(err);
+        }
+        res.render("item_form", {
+          title: "Update Item",
+          item: newItem,
+          categories: categories,
+          errors: errors.array(),
+        });
+      });
+      return;
+    }
+
+    itemModel.findByIdAndUpdate(
+      req.params.ID,
+      newItem,
+      {},
+      (err, updatedItem) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect(updatedItem.url);
+      }
+    );
+  },
+];

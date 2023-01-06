@@ -93,3 +93,112 @@ exports.CategoryFormPost = [
     });
   },
 ];
+
+exports.CategoryDeleteGet = function (req, res, next) {
+  async.parallel(
+    {
+      category: function (callback) {
+        categoryModel.findById(req.params.ID).exec((err, category) => {
+          if (err) {
+            return next(err);
+          }
+          callback(null, category);
+        });
+      },
+      categoryItems: function (callback) {
+        itemModel.find({ category: req.params.ID }).exec((err, items) => {
+          if (err) {
+            return next(err);
+          }
+          callback(null, items);
+        });
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      console.log(results);
+      if (results.category === null) {
+        res.redirect("/inventory/categories");
+        return;
+      }
+      if (results.categoryItems.length === 0) {
+        res.render("category_delete", { category: results.category });
+        return;
+      }
+      res.render("category_delete", {
+        category: results.category,
+        items: results.categoryItems,
+      });
+    }
+  );
+};
+
+exports.CategoryDeletePost = function (req, res, next) {
+  categoryModel.findByIdAndRemove(req.body.categoryid).exec((err, category) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/inventory/categories");
+  });
+};
+
+exports.CategoryUpdateGet = function (req, res, next) {
+  categoryModel.findById(req.params.ID).exec((err, category) => {
+    if (err) {
+      return next(err);
+    }
+    if (category === null) {
+      res.redirect("/inventory/categories");
+      return;
+    }
+    res.render("category_form", {
+      title: "Update category",
+      category: category,
+    });
+  });
+};
+
+exports.CategoryUpdatePost = [
+  body("name")
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage("Category Name must be specified")
+    .isAlphanumeric()
+    .withMessage("Category Name should not be alphanumeric"),
+  body("description")
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage("Description must not be empty"),
+  function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.render("category_form", {
+        title: "Update a category",
+        category: req.body,
+        errors: errors.array(),
+      });
+      return;
+    }
+
+    const newCategory = new categoryModel({
+      name: req.body.name,
+      description: req.body.description,
+      _id: req.params.ID,
+    });
+    categoryModel.findByIdAndUpdate(
+      req.params.ID,
+      newCategory,
+      {},
+      function (err, category) {
+        if (err) {
+          return next(err);
+        }
+        res.redirect(category.url);
+      }
+    );
+  },
+];

@@ -1,0 +1,20 @@
+extends layout 
+
+block content 
+  h1= `Delete ${category.name}`
+  if items !== undefined 
+    h3 Please delete these items before deleting this category 
+    each item in items 
+      a(href= item.url)= item.name
+  else 
+    h3 Do you really want to delete this category?
+    form(method='POST' action='')
+      div.form-group
+        input(type='hidden',name='categoryid', required='true', value=category._id, id = "categoryid" )
+        button(type="submit") Yes 
+        a(href="/inventory/categories/") No
+
+
+    
+
+    
