@@ -3,6 +3,8 @@ extends layout
 block content 
  h1= category.name 
  p= category.description
+ if category.image.data 
+  img(src= `data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
  ul 
   each item in categoryItems 
    li 

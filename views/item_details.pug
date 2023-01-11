@@ -3,6 +3,8 @@ extends layout
 block content 
  h1=  `${item.name}`
  p= `${item.description}`
+ if item.image.data 
+    img(src= `data:${item.image.contentType};base64,${item.image.data}`, alt=item.name)
  p= `${item.price}` 
  p= `${item.numberinstock}` 
  p= `${item.category.name}`

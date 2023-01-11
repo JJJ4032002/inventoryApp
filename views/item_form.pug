@@ -2,7 +2,7 @@ extends layout
 
 block content 
  h1= title 
- form(action="", method="post") 
+ form(action="", method="post",enctype="multipart/form-data") 
     .formGroup 
         label(for = "name") Name 
         input(name = "name", id = "name", value = `${item === undefined ? "" : item.name}`, required)
@@ -26,8 +26,15 @@ block content
                      item.category._id.toString() || category._id.toString() == item.category ? "selected" : 
                       false) )= category.name  
                 else 
-                    option(value= category._id)= category.name 
-    button(type="submit") Submit 
+                    option(value= category._id)= category.name
+    .formGroup 
+        label(for="itemFile") Upload an Image 
+        input(type="file", name="itemFile",id = "itemFile")
+        p image file does not persist when page is reloaded due to some error  
+    button(type="submit") Submit
+ if image
+    img(src=`data:${image.contentType};base64,${image.data}`, alt="Item image")
+    p This is your saved item image.
  if errors
     ul
       for error in errors
