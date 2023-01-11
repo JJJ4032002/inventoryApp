@@ -1,5 +1,8 @@
 const categoryModel = require("../models/category");
 const itemModel = require("../models/item");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const async = require("async");
 const { body, validationResult } = require("express-validator");
 exports.Categories = function (req, res, next) {
@@ -44,6 +47,10 @@ exports.CategoryDetails = function (req, res, next) {
       if (results.CategoryDetails === undefined) {
         res.redirect("/inventory/categories");
       }
+      if (results.CategoryDetails.image.data) {
+        results.CategoryDetails.image.data =
+          results.CategoryDetails.image.data.toString("base64");
+      }
       res.render("category_details", {
         category: results.CategoryDetails,
         categoryItems: results.CategoryItems,
@@ -72,7 +79,6 @@ exports.CategoryFormPost = [
   function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(req.body);
       res.render("category_form", {
         title: "Create a category",
         category: req.body,
@@ -80,11 +86,23 @@ exports.CategoryFormPost = [
       });
       return;
     }
+    let newCategory;
+    if (req.file === undefined) {
+      newCategory = new categoryModel({
+        name: req.body.name,
+        description: req.body.description,
+      });
+    } else {
+      newCategory = new categoryModel({
+        name: req.body.name,
+        description: req.body.description,
+        image: {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        },
+      });
+    }
 
-    const newCategory = new categoryModel({
-      name: req.body.name,
-      description: req.body.description,
-    });
     newCategory.save((err) => {
       if (err) {
         return next(err);
@@ -118,7 +136,6 @@ exports.CategoryDeleteGet = function (req, res, next) {
       if (err) {
         return next(err);
       }
-      console.log(results);
       if (results.category === null) {
         res.redirect("/inventory/categories");
         return;
@@ -153,10 +170,19 @@ exports.CategoryUpdateGet = function (req, res, next) {
       res.redirect("/inventory/categories");
       return;
     }
-    res.render("category_form", {
-      title: "Update category",
-      category: category,
-    });
+    if (category.image.data) {
+      category.image.data = category.image.data.toString("base64");
+      res.render("category_form", {
+        title: "Update category",
+        category: category,
+        image: { ...category.image },
+      });
+    } else {
+      res.render("category_form", {
+        title: "Update category",
+        category: category,
+      });
+    }
   });
 };
 
@@ -175,30 +201,68 @@ exports.CategoryUpdatePost = [
     .withMessage("Description must not be empty"),
   function (req, res, next) {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.render("category_form", {
-        title: "Update a category",
-        category: req.body,
-        errors: errors.array(),
-      });
-      return;
-    }
-
-    const newCategory = new categoryModel({
-      name: req.body.name,
-      description: req.body.description,
-      _id: req.params.ID,
-    });
-    categoryModel.findByIdAndUpdate(
-      req.params.ID,
-      newCategory,
-      {},
-      function (err, category) {
-        if (err) {
-          return next(err);
-        }
-        res.redirect(category.url);
+    categoryModel.findById(req.params.ID).exec((err, category) => {
+      if (err) {
+        return next(err);
       }
-    );
+      if (!errors.isEmpty()) {
+        if (category.image.data) {
+          category.image.data = category.image.data.toString("base64");
+          res.render("category_form", {
+            title: "Update a category",
+            category: req.body,
+            image: { ...category.image },
+            errors: errors.array(),
+          });
+        } else {
+          res.render("category_form", {
+            title: "Update a category",
+            category: req.body,
+            errors: errors.array(),
+          });
+        }
+        return;
+      }
+      let newCategory;
+      if (req.file === undefined) {
+        newCategory = category.image.data
+          ? new categoryModel({
+              name: req.body.name,
+              description: req.body.description,
+              image: {
+                data: category.image.data,
+                contentType: category.image.contentType,
+              },
+              _id: req.params.ID,
+            })
+          : new categoryModel({
+              name: req.body.name,
+              description: req.body.description,
+              _id: req.params.ID,
+            });
+      } else {
+        newCategory = new categoryModel({
+          name: req.body.name,
+          description: req.body.description,
+          image: {
+            data: req.file.buffer,
+            contentType: req.file.mimetype,
+          },
+          _id: req.params.ID,
+        });
+      }
+
+      categoryModel.findByIdAndUpdate(
+        req.params.ID,
+        newCategory,
+        {},
+        function (err, category) {
+          if (err) {
+            return next(err);
+          }
+          res.redirect(category.url);
+        }
+      );
+    });
   },
 ];

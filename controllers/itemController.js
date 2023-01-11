@@ -1,6 +1,9 @@
 const itemModel = require("../models/item");
 const categoryModel = require("../models/category");
 const async = require("async");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const { body, validationResult } = require("express-validator");
 exports.index = function (req, res, next) {
   res.render("index", { title: "Cakery" });
@@ -29,9 +32,11 @@ exports.ItemDetails = function (req, res, next) {
       if (err) {
         return next(err);
       }
-      console.log(item);
       if (item === undefined) {
         res.redirect("/inventory/items");
+      }
+      if (item.image.data) {
+        item.image.data = item.image.data.toString("base64");
       }
       res.render("item_details", { item: item });
     });
@@ -92,13 +97,29 @@ exports.ItemFormPost = [
       });
       return;
     }
-    let newItem = new itemModel({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      numberinstock: req.body.numberinstock,
-      category: req.body.category,
-    });
+    let newItem;
+    if (req.file) {
+      newItem = new itemModel({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        numberinstock: req.body.numberinstock,
+        category: req.body.category,
+        image: {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        },
+      });
+    } else {
+      newItem = new itemModel({
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        numberinstock: req.body.numberinstock,
+        category: req.body.category,
+      });
+    }
+
     newItem.save((err, results) => {
       if (err) {
         return next(err);
@@ -153,12 +174,21 @@ exports.ItemUpdateGet = function (req, res, next) {
       if (err) {
         return next(err);
       }
-      console.log(results.item.category._id.toString());
-      res.render("item_form", {
-        title: "Update Item",
-        item: results.item,
-        categories: results.categories,
-      });
+      if (results.item.image.data) {
+        results.item.image.data = results.item.image.data.toString("base64");
+        res.render("item_form", {
+          title: "Update Item",
+          item: results.item,
+          categories: results.categories,
+          image: { ...results.item.image },
+        });
+      } else {
+        res.render("item_form", {
+          title: "Update Item",
+          item: results.item,
+          categories: results.categories,
+        });
+      }
     }
   );
 };
@@ -188,39 +218,92 @@ exports.ItemUpdatePost = [
     .withMessage("The number of items present in stock cannot be less than 0"),
   function (req, res, next) {
     const errors = validationResult(req);
-    let newItem = new itemModel({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      numberinstock: req.body.numberinstock,
-      category: req.body.category,
-      _id: req.params.ID,
-    });
-    if (!errors.isEmpty()) {
-      categoryModel.find({}).exec(function (err, categories) {
-        if (err) {
-          return next(err);
-        }
-        res.render("item_form", {
-          title: "Update Item",
-          item: newItem,
-          categories: categories,
-          errors: errors.array(),
-        });
-      });
-      return;
-    }
-
-    itemModel.findByIdAndUpdate(
-      req.params.ID,
-      newItem,
-      {},
-      (err, updatedItem) => {
-        if (err) {
-          return next(err);
-        }
-        res.redirect(updatedItem.url);
+    itemModel.findById(req.params.ID).exec((err, item) => {
+      if (err) {
+        return next(err);
       }
-    );
+
+      if (!errors.isEmpty()) {
+        let errorItem = new itemModel({
+          name: req.body.name,
+          description: req.body.description,
+          price: req.body.price,
+          numberinstock: req.body.numberinstock,
+          category: req.body.category,
+          _id: req.params.ID,
+        });
+        categoryModel.find({}).exec(function (err, categories) {
+          if (err) {
+            return next(err);
+          }
+          if (item.image.data) {
+            item.image.data = item.image.data.toString("base64");
+            res.render("item_form", {
+              title: "Update Item",
+              item: errorItem,
+              categories: categories,
+              image: { ...item.image },
+              errors: errors.array(),
+            });
+          } else {
+            res.render("item_form", {
+              title: "Update Item",
+              item: errorItem,
+              categories: categories,
+              errors: errors.array(),
+            });
+          }
+        });
+        return;
+      }
+      let newItem;
+      if (req.file) {
+        newItem = new itemModel({
+          name: req.body.name,
+          description: req.body.description,
+          price: req.body.price,
+          numberinstock: req.body.numberinstock,
+          category: req.body.category,
+          image: {
+            data: req.file.buffer,
+            contentType: req.file.mimetype,
+          },
+          _id: req.params.ID,
+        });
+      } else {
+        newItem = item.image.data
+          ? new itemModel({
+              name: req.body.name,
+              description: req.body.description,
+              price: req.body.price,
+              numberinstock: req.body.numberinstock,
+              category: req.body.category,
+              image: {
+                ...item.image,
+              },
+              _id: req.params.ID,
+            })
+          : new itemModel({
+              name: req.body.name,
+              description: req.body.description,
+              price: req.body.price,
+              numberinstock: req.body.numberinstock,
+              category: req.body.category,
+              _id: req.params.ID,
+            });
+      }
+
+      itemModel.findByIdAndUpdate(
+        req.params.ID,
+        newItem,
+        {},
+        (err, updatedItem) => {
+          if (err) {
+            return next(err);
+          }
+          res.redirect(updatedItem.url);
+        }
+      );
+    });
   },
 ];
