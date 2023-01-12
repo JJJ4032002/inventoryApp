@@ -1,5 +1,6 @@
 #! /usr/bin/env node
-
+const fs = require("fs");
+const path = require("node:path");
 console.log(
   "This script populates some test books, authors, genres and bookinstances to your database. Specified database as argument - e.g.: populatedb mongodb+srv://cooluser:coolpassword@cluster0.a9azn.mongodb.net/local_library?retryWrites=true"
 );
@@ -26,39 +27,63 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 var categories = [];
 var items = [];
 
-function categoryCreate(name, description, cb) {
-  categorydetail = { name: name, description: description };
+function categoryCreate(name, description, imagePath, cb) {
+  const promise = fs.promises.readFile(path.join(imagePath));
 
-  var category = new Category(categorydetail);
+  Promise.resolve(promise).then(function (buffer) {
+    categorydetail = {
+      name: name,
+      description: description,
+      image: { data: buffer, contentType: "image/jpeg" },
+    };
 
-  category.save(function (err) {
-    if (err) {
-      cb(err, null);
-      return;
-    }
-    console.log("New Author: " + category);
-    categories.push(category);
-    cb(null, category);
+    var category = new Category(categorydetail);
+
+    category.save(function (err) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      console.log("New Author: " + category);
+      categories.push(category);
+      cb(null, category);
+    });
   });
 }
 
-function itemCreate(name, description, price, numberinstock, category, cb) {
-  var item = new Item({
-    name: name,
-    description: description,
-    price: price,
-    numberinstock: numberinstock,
-    category: category,
-  });
+function itemCreate(
+  name,
+  description,
+  price,
+  numberinstock,
+  category,
+  imagePath,
+  cb
+) {
+  const promise = fs.promises.readFile(path.join(imagePath));
 
-  item.save(function (err) {
-    if (err) {
-      cb(err, null);
-      return;
-    }
-    console.log("New Item: " + item);
-    items.push(item);
-    cb(null, item);
+  Promise.resolve(promise).then(function (buffer) {
+    var item = new Item({
+      name: name,
+      description: description,
+      price: price,
+      numberinstock: numberinstock,
+      category: category,
+      image: {
+        data: buffer,
+        contentType: "image/jpeg",
+      },
+    });
+
+    item.save(function (err) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      console.log("New Item: " + item);
+      items.push(item);
+      cb(null, item);
+    });
   });
 }
 
@@ -69,6 +94,7 @@ function createCategories(cb) {
         categoryCreate(
           "Bread",
           "Bread, baked food product made of flour or meal that is moistened, kneaded, and sometimes fermented. A major food since prehistoric times, it has been made in various forms using a variety of ingredients and methods throughout the world.",
+          "./assets/Categories/Bread.jpg",
           callback
         );
       },
@@ -76,6 +102,7 @@ function createCategories(cb) {
         categoryCreate(
           "Cake",
           "A cake is a sweet food made by baking a mixture of flour, eggs, sugar, and fat in an oven.",
+          "./assets/Categories/Cake.jpg",
           callback
         );
       },
@@ -83,6 +110,7 @@ function createCategories(cb) {
         categoryCreate(
           "Bun",
           "A bun is a type of bread roll, typically filled with savory fillings (for example hamburger). A bun may also refer to a sweet cake in certain parts of the world. Though they come in many shapes and sizes, buns are most commonly round, and are generally hand-sized or smaller.",
+          "./assets/Categories/Bun.jpg",
           callback
         );
       },
@@ -90,6 +118,7 @@ function createCategories(cb) {
         categoryCreate(
           "Pasteries",
           "pastry, stiff dough made from flour, salt, a relatively high proportion of fat, and a small proportion of liquid. It may also contain sugar or flavourings. Most pastry is leavened only by the action of steam, but Danish pastry is raised with yeast.",
+          "./assets/Categories/Pasteries.jpg",
           callback
         );
       },
@@ -97,6 +126,7 @@ function createCategories(cb) {
         categoryCreate(
           "Biscuits",
           "A biscuit is a flour-based baked and shaped food product. In most countries biscuits are typically hard, flat, and unleavened. They are usually sweet and may be made with sugar, chocolate, icing, jam, ginger, or cinnamon.",
+          "./assets/Categories/Biscuits.jpg",
           callback
         );
       },
@@ -104,6 +134,7 @@ function createCategories(cb) {
         categoryCreate(
           "Cookies",
           "A cookie is a baked or cooked snack or dessert that is typically small, flat and sweet. It usually contains flour, sugar, egg, and some type of oil, fat, or butter. It may include other ingredients such as raisins, oats, chocolate chips, nuts, etc.",
+          "./assets/Categories/Cookies.jpg",
           callback
         );
       },
@@ -111,6 +142,7 @@ function createCategories(cb) {
         categoryCreate(
           "Doughnuts",
           "Doughnuts are a kind of ring-shaped snack food popular in many countries, which are usually deep fried from flour doughs. After being fried, doughnuts can be spread with chocolate or icing on top, covered with powdered sugar or fruit, or glazed with sugar icing.",
+          "./assets/Categories/Doughnuts.jpg",
           callback
         );
       },
@@ -118,6 +150,7 @@ function createCategories(cb) {
         categoryCreate(
           "Crackers",
           "A cracker is a flat, dry baked food typically made with flour. Flavorings or seasonings, such as salt, herbs, seeds, or cheese, may be added to the dough or sprinkled on top before baking. Crackers are often branded as a nutritious and convenient way to consume a staple food or cereal grain.",
+          "./assets/Categories/Crackers.jpg",
           callback
         );
       },
@@ -137,6 +170,7 @@ function createItems(cb) {
           400,
           10,
           categories[1],
+          "./assets/Items/ChocolateMud.jpg",
           callback
         );
       },
@@ -147,6 +181,7 @@ function createItems(cb) {
           450,
           5,
           categories[1],
+          "./assets/Items/MarbledMud.jpg",
           callback
         );
       },
@@ -157,6 +192,7 @@ function createItems(cb) {
           500,
           7,
           categories[1],
+          "./assets/Items/RedVelvet.jpg",
           callback
         );
       },
@@ -167,6 +203,7 @@ function createItems(cb) {
           90,
           7,
           categories[0],
+          "./assets/Items/CarawayRye.jpg",
           callback
         );
       },
@@ -177,6 +214,7 @@ function createItems(cb) {
           120,
           20,
           categories[0],
+          "./assets/Items/KalamattaBatard.jpg",
           callback
         );
       },
@@ -187,6 +225,7 @@ function createItems(cb) {
           50,
           40,
           categories[2],
+          "./assets/Items/FruitBun.jpg",
           callback
         );
       },
@@ -197,6 +236,7 @@ function createItems(cb) {
           70,
           15,
           categories[2],
+          "./assets/Items/IcedBuns.jpg",
           callback
         );
       },
@@ -207,6 +247,7 @@ function createItems(cb) {
           100,
           20,
           categories[3],
+          "./assets/Items/Cronut.jpg",
           callback
         );
       },
@@ -217,6 +258,7 @@ function createItems(cb) {
           60,
           40,
           categories[3],
+          "./assets/Items/Gujiya.jpg",
           callback
         );
       },
@@ -227,6 +269,7 @@ function createItems(cb) {
           10,
           120,
           categories[4],
+          "./assets/Items/Scone.jpg",
           callback
         );
       },
@@ -237,6 +280,7 @@ function createItems(cb) {
           35,
           100,
           categories[4],
+          "./assets/Items/ShortCake.jpg",
           callback
         );
       },
@@ -247,6 +291,7 @@ function createItems(cb) {
           45,
           55,
           categories[5],
+          "./assets/Items/ChocolateChip.jpg",
           callback
         );
       },
@@ -257,6 +302,7 @@ function createItems(cb) {
           20,
           50,
           categories[5],
+          "./assets/Items/GingerSnaps.jpg",
           callback
         );
       },
@@ -267,6 +313,7 @@ function createItems(cb) {
           85,
           75,
           categories[6],
+          "./assets/Items/SugarDoughnuts.jpg",
           callback
         );
       },
@@ -277,6 +324,7 @@ function createItems(cb) {
           21,
           70,
           categories[6],
+          "./assets/Items/ChocolateSprinkles.jpg",
           callback
         );
       },
@@ -287,6 +335,7 @@ function createItems(cb) {
           125,
           20,
           categories[7],
+          "./assets/Items/CheeseCrackers.jpg",
           callback
         );
       },
