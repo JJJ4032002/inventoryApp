@@ -33,6 +33,14 @@ router.post(
 router.get("/item/:ID/delete", itemController.ItemDeleteGet);
 //Deletes the item
 router.post("/item/:ID/delete", itemController.ItemDeletePost);
+//Direct to the create category form page
+router.get("/category/new", categoryController.CategoryFormGet);
+// Add the new category
+router.post(
+  "/category/new",
+  upload.single("categoryFile"),
+  categoryController.CategoryFormPost
+);
 //Directs to the update category page
 router.get("/category/:ID/update", categoryController.CategoryUpdateGet);
 //updates the category
@@ -45,14 +53,7 @@ router.post(
 router.get("/category/:ID/delete", categoryController.CategoryDeleteGet);
 //Deletes the category
 router.post("/category/:ID/delete", categoryController.CategoryDeletePost);
-//Direct to the create category form page
-router.get("/category/new", categoryController.CategoryFormGet);
-// Add the new category
-router.post(
-  "/category/new",
-  upload.single("categoryFile"),
-  categoryController.CategoryFormPost
-);
+
 //Directs to the page which displays individual Category details
 router.get("/category/:ID", categoryController.CategoryDetails);
 
