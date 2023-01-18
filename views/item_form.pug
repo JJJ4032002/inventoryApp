@@ -1,41 +1,46 @@
 extends layout 
 
-block content 
- h1= title 
- form(action="", method="post",enctype="multipart/form-data") 
-    .formGroup 
-        label(for = "name") Name 
-        input(name = "name", id = "name", value = `${item === undefined ? "" : item.name}`, required)
-    .formGroup 
-        label(for = "description") Description 
-        textarea(name = "description", id = "description", required)= item === undefined ? "" : item.description
-    .formGroup 
-        label(for = "price") Price 
-        input(type="number", name="price",id = "price",value = `${item === undefined ? "" : item.price}`,required, min = 0)
-    .formGroup 
-        label(for = "numberinstock") Number in Stock 
-        input(type="number", name="numberinstock",id = "numberinstock",value = `${item === undefined ? "" : 
-         item.numberinstock}`, required, min = 0)
-    .formGroup 
-        label(for = "category") Select a Category 
-        select(name="category", id = "category", placeholder = "Please select a category", required)
-           - categories.sort(function(a,b) {return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;})
-             for category in categories
-                if item
-                    option(value= category._id, selected = (category._id.toString() ===                 
-                     item.category._id.toString() || category._id.toString() == item.category ? "selected" : 
-                      false) )= category.name  
-                else 
-                    option(value= category._id)= category.name
-    .formGroup 
-        label(for="itemFile") Upload an Image 
-        input(type="file", name="itemFile",id = "itemFile")
-        p image file does not persist when page is reloaded due to some error  
-    button(type="submit") Submit
- if image
-    img(src=`data:${image.contentType};base64,${image.data}`, alt="Item image")
-    p This is your saved item image.
- if errors
-    ul
-      for error in errors
-        li!= error.msg               
+block content
+    section.itemForm
+        .formContainer
+            h1= title 
+            form(action="", method="post",enctype="multipart/form-data") 
+                .group 
+                    label(for = "name") Name 
+                    input(name = "name", id = "name", value = `${item === undefined ? "" : item.name}`, placeholder = "Name", required)
+                .group 
+                    label(for = "description") Description 
+                    textarea(name = "description", id = "description",placeholder = "Add a description", required, rows = 5)= item === undefined ? "" : item.description
+                .group 
+                    label(for = "price") Price 
+                    input(type="number", name="price",id = "price",value = `${item === undefined ? "" : item.price}`,placeholder = "Price",required, min = 0)
+                .group 
+                    label(for = "numberinstock") Number in Stock 
+                    input(type="number", name="numberinstock",id = "numberinstock",value = `${item === undefined ? "" : 
+                    item.numberinstock}`,placeholder = "Number in stock", required, min = 0)
+                .group 
+                    label(for = "category") Select a Category 
+                    select(name="category", id = "category", placeholder = "Please select a category", required)
+                        - categories.sort(function(a,b) {return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;})
+                            for category in categories
+                                if item
+                                    option(value= category._id, selected = (item.category._id && category._id.toString() === item.category._id.toString() || category._id.toString() == item.category ? "selected" : 
+                                    false) )= category.name  
+                                else 
+                                    option(value= category._id)= category.name
+                .group 
+                    label(for="itemFile") Upload an Image 
+                    input(type="file", name="itemFile",id = "itemFile")
+                    p image file does not persist when page is reloaded due to some error  
+                button.button(type="submit") Submit
+                if errors
+                    ul
+                        for error in errors
+                            li.error!= error.msg 
+        .imageContainer
+            if image
+                img(src=`data:${image.contentType};base64,${image.data}`, alt="Item image")
+                p This is your saved item image.
+            else 
+                img(src="BirthdayCake.svg", alt="Birthday Cake")
+                           

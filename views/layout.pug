@@ -2,6 +2,14 @@ doctype html
 html
   head
     title= title
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
+    nav 
+      .item
+        a#titleLink(href="/inventory") Cakery 
+      .item#listLinks 
+        a(href="/inventory/items") Items 
+        a(href="/inventory/categories") Categories  
     block content

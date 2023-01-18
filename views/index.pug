@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  main 
+    .bannerImageContainer 
+     img.bannerImage(src= `BannerImage.svg`, alt="Banner Image")
+    .text 
+      h1 We bake #[span#red Sweets] that make you #[span#yellow Happy]
+      .buttonsContainer 
+        a.button(href="/inventory/item/new") Add Item
+        a.button(href="/inventory/category/new") Add Category 
+

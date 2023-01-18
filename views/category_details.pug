@@ -1,13 +1,19 @@
 extends layout 
 
-block content 
- h1= category.name 
- p= category.description
- if category.image.data 
-  img(src= `data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
- ul 
-  each item in categoryItems 
-   li 
-    a(href= item.url) #{item.name}
- a(href= category.url + "/delete") Delete
- a(href= category.url + "/update") Update
+block content
+   section.categoryDetails
+      .details
+         h1= category.name 
+         p= category.description
+         .categoryItems
+            p Items :
+            ul 
+            each item in categoryItems 
+               li 
+               a(href= item.url) #{item.name}
+         .buttonsContainer
+            a.button(href= category.url + "/delete") Delete
+            a.button(href= category.url + "/update") Update
+      .imageContainer   
+         if category.image.data 
+         img(src= `data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)

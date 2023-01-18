@@ -1,8 +1,13 @@
 extends layout 
 
-block content 
-  h1= title 
-  ul 
-   each category in categories_list 
-    li 
-     a(href = category.url) #{category.name}
+block content
+  section.categories 
+    h1= title 
+    ul.list 
+      each category in categories_list 
+        li 
+          a.link(href = category.url) 
+            .block
+              img(src=`data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
+              p= category.name
+              img.open(src="Open.svg", alt="Open Category")
