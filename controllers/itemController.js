@@ -4,9 +4,11 @@ const async = require("async");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const fs = require("fs");
+const path = require("node:path");
 const { body, validationResult } = require("express-validator");
 exports.index = function (req, res, next) {
-  res.render("index", { title: "Cakery" });
+  res.render("index");
 };
 
 exports.Items = function (req, res, next) {
@@ -17,6 +19,11 @@ exports.Items = function (req, res, next) {
       if (err) {
         return next(err);
       }
+      items_list.forEach((item) => {
+        if (item.image.data) {
+          item.image.data = item.image.data.toString("base64");
+        }
+      });
       res.render("items_list", {
         title: "Select an Item",
         items_list: items_list,
@@ -88,6 +95,7 @@ exports.ItemFormPost = [
         if (err) {
           return next(err);
         }
+        console.log(req.body);
         res.render("item_form", {
           title: "Create an Item",
           item: req.body,

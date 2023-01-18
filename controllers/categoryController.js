@@ -13,6 +13,11 @@ exports.Categories = function (req, res, next) {
       if (err) {
         return next(err);
       }
+      categories_list.forEach((category) => {
+        if (category.image.data) {
+          category.image.data = category.image.data.toString("base64");
+        }
+      });
       res.render("categories_list", {
         title: "Select your Category",
         categories_list: categories_list,
