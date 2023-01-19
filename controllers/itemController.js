@@ -88,6 +88,11 @@ exports.ItemFormPost = [
     .escape()
     .isFloat({ min: 0 })
     .withMessage("The number of items present in stock cannot be less than 0"),
+  body("itemPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
   function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -113,6 +118,7 @@ exports.ItemFormPost = [
         price: req.body.price,
         numberinstock: req.body.numberinstock,
         category: req.body.category,
+        password: req.body.itemPassword,
         image: {
           data: req.file.buffer,
           contentType: req.file.mimetype,
@@ -125,6 +131,7 @@ exports.ItemFormPost = [
         price: req.body.price,
         numberinstock: req.body.numberinstock,
         category: req.body.category,
+        password: req.body.itemPassword,
       });
     }
 
@@ -146,14 +153,37 @@ exports.ItemDeleteGet = function (req, res, next) {
   });
 };
 
-exports.ItemDeletePost = function (req, res, next) {
-  itemModel.findByIdAndRemove(req.body.itemid).exec(function (err, item) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/inventory/items");
-  });
-};
+exports.ItemDeletePost = [
+  body("itemPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
+  function (req, res, next) {
+    const errors = validationResult(req);
+    itemModel.findById(req.params.ID).exec(function (err, item) {
+      if (err) {
+        return next(err);
+      }
+      if (req.body.itemPassword !== item.password || !errors.isEmpty()) {
+        res.render("item_delete", {
+          item: item,
+          errors:
+            req.body.itemPassword !== item.password
+              ? [{ msg: "Password does not match" }, ...errors.array()]
+              : errors.array(),
+        });
+      } else {
+        itemModel.findByIdAndRemove(req.body.itemid).exec(function (err, item) {
+          if (err) {
+            return next(err);
+          }
+          res.redirect("/inventory/items");
+        });
+      }
+    });
+  },
+];
 
 exports.ItemUpdateGet = function (req, res, next) {
   async.parallel(
@@ -224,6 +254,11 @@ exports.ItemUpdatePost = [
     .escape()
     .isFloat({ min: 0 })
     .withMessage("The number of items present in stock cannot be less than 0"),
+  body("itemPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
   function (req, res, next) {
     const errors = validationResult(req);
     itemModel.findById(req.params.ID).exec((err, item) => {
@@ -231,13 +266,14 @@ exports.ItemUpdatePost = [
         return next(err);
       }
 
-      if (!errors.isEmpty()) {
+      if (!errors.isEmpty() || req.body.itemPassword !== item.password) {
         let errorItem = new itemModel({
           name: req.body.name,
           description: req.body.description,
           price: req.body.price,
           numberinstock: req.body.numberinstock,
           category: req.body.category,
+          password: item.password,
           _id: req.params.ID,
         });
         categoryModel.find({}).exec(function (err, categories) {
@@ -251,14 +287,20 @@ exports.ItemUpdatePost = [
               item: errorItem,
               categories: categories,
               image: { ...item.image },
-              errors: errors.array(),
+              errors:
+                req.body.itemPassword !== item.password
+                  ? [{ msg: "Password does not match" }, ...errors.array()]
+                  : errors.array(),
             });
           } else {
             res.render("item_form", {
               title: "Update Item",
               item: errorItem,
               categories: categories,
-              errors: errors.array(),
+              errors:
+                req.body.itemPassword !== item.password
+                  ? [{ msg: "Password does not match" }, ...errors.array()]
+                  : errors.array(),
             });
           }
         });
@@ -276,6 +318,7 @@ exports.ItemUpdatePost = [
             data: req.file.buffer,
             contentType: req.file.mimetype,
           },
+          password: req.body.itemPassword,
           _id: req.params.ID,
         });
       } else {
@@ -286,6 +329,7 @@ exports.ItemUpdatePost = [
               price: req.body.price,
               numberinstock: req.body.numberinstock,
               category: req.body.category,
+              password: req.body.itemPassword,
               image: {
                 ...item.image,
               },
@@ -297,6 +341,7 @@ exports.ItemUpdatePost = [
               price: req.body.price,
               numberinstock: req.body.numberinstock,
               category: req.body.category,
+              password: req.body.itemPassword,
               _id: req.params.ID,
             });
       }

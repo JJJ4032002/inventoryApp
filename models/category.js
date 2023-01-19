@@ -5,6 +5,7 @@ let categorySchema = new Schema({
   name: { type: String, required: true },
   description: String,
   image: { data: Buffer, contentType: String },
+  password: { type: String, required: true },
 });
 
 categorySchema.virtual("url").get(function () {

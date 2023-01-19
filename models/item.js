@@ -8,6 +8,7 @@ let itemSchema = new Schema({
   numberinstock: { type: Number, min: [0, "Items cannot be negative"] },
   category: { ref: "Category", type: Schema.Types.ObjectId },
   image: { data: Buffer, contentType: String },
+  password: { type: String, required: true },
 });
 
 itemSchema.virtual("url").get(function () {

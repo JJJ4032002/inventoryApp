@@ -81,6 +81,11 @@ exports.CategoryFormPost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Description must not be empty"),
+  body("categoryPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
   function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -96,6 +101,7 @@ exports.CategoryFormPost = [
       newCategory = new categoryModel({
         name: req.body.name,
         description: req.body.description,
+        password: req.body.categoryPassword,
       });
     } else {
       newCategory = new categoryModel({
@@ -105,6 +111,7 @@ exports.CategoryFormPost = [
           data: req.file.buffer,
           contentType: req.file.mimetype,
         },
+        password: req.body.categoryPassword,
       });
     }
 
@@ -157,14 +164,63 @@ exports.CategoryDeleteGet = function (req, res, next) {
   );
 };
 
-exports.CategoryDeletePost = function (req, res, next) {
-  categoryModel.findByIdAndRemove(req.body.categoryid).exec((err, category) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/inventory/categories");
-  });
-};
+exports.CategoryDeletePost = [
+  body("categoryPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
+  function (req, res, next) {
+    const errors = validationResult(req);
+    categoryModel.findById(req.body.categoryid).exec((err, category) => {
+      if (err) {
+        return next(err);
+      }
+      if (
+        req.body.categoryPassword !== category.password ||
+        !errors.isEmpty()
+      ) {
+        itemModel.find({ category: req.body.categoryid }).exec((err, items) => {
+          if (err) {
+            return next(err);
+          }
+          if (category === null) {
+            res.redirect("/inventory/categories");
+            return;
+          }
+          if (items.length === 0) {
+            console.log(errors.array());
+            res.render("category_delete", {
+              category: category,
+              errors:
+                req.body.categoryPassword !== category.password
+                  ? [{ msg: "Password does not match" }, ...errors.array()]
+                  : errors.array(),
+            });
+            return;
+          }
+          res.render("category_delete", {
+            category: category,
+            items: items,
+            errors:
+              req.body.categoryPassword !== category.password
+                ? [{ msg: "Password does not match" }, ...errors.array()]
+                : errors.array(),
+          });
+        });
+      } else {
+        categoryModel
+          .findByIdAndRemove(req.body.categoryid)
+          .exec((err, category) => {
+            if (err) {
+              return next(err);
+            }
+            res.redirect("/inventory/categories");
+          });
+      }
+    });
+  },
+];
 
 exports.CategoryUpdateGet = function (req, res, next) {
   categoryModel.findById(req.params.ID).exec((err, category) => {
@@ -204,26 +260,40 @@ exports.CategoryUpdatePost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Description must not be empty"),
+  body("categoryPassword")
+    .trim()
+    .escape()
+    .isLength({ min: 8 })
+    .withMessage("Password must be minimum of 8 letters"),
   function (req, res, next) {
     const errors = validationResult(req);
     categoryModel.findById(req.params.ID).exec((err, category) => {
       if (err) {
         return next(err);
       }
-      if (!errors.isEmpty()) {
+      if (
+        !errors.isEmpty() ||
+        req.body.categoryPassword !== category.password
+      ) {
         if (category.image.data) {
           category.image.data = category.image.data.toString("base64");
           res.render("category_form", {
             title: "Update a category",
             category: req.body,
             image: { ...category.image },
-            errors: errors.array(),
+            errors:
+              req.body.categoryPassword !== category.password
+                ? [{ msg: "Password does not match" }, ...errors.array()]
+                : errors.array(),
           });
         } else {
           res.render("category_form", {
             title: "Update a category",
             category: req.body,
-            errors: errors.array(),
+            errors:
+              req.body.categoryPassword !== category.password
+                ? [{ msg: "Password does not match" }, ...errors.array()]
+                : errors.array(),
           });
         }
         return;
