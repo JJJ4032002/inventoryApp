@@ -23,3 +23,6 @@ block content
       .imageContainer      
          if item.image.data 
             img(src= `data:${item.image.contentType};base64,${item.image.data}`, alt=item.name) 
+         else 
+            img(src="Baking.svg", alt="Baking")
+            p There is no image associated with this item

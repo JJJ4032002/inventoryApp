@@ -8,7 +8,8 @@ block content
                 li 
                     a.link(href= item.url)
                         .block
-                            img(src=`data:${item.image.contentType};base64,${item.image.data}`, alt=item.name)
+                            if item.image.data
+                                img(src=`data:${item.image.contentType};base64,${item.image.data}`, alt=item.name)
                             p= item.name
                             img.open(src="Open.svg", alt="Open Item") 
 

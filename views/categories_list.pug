@@ -8,6 +8,7 @@ block content
         li 
           a.link(href = category.url) 
             .block
-              img(src=`data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
+              if category.image.data
+                img(src=`data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
               p= category.name
               img.open(src="Open.svg", alt="Open Category")

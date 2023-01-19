@@ -16,4 +16,7 @@ block content
             a.button(href= category.url + "/update") Update
       .imageContainer   
          if category.image.data 
-         img(src= `data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
+            img(src= `data:${category.image.contentType};base64,${category.image.data}`, alt=category.name)
+         else
+            img(src= `BirthdayCake.svg`, alt="Birthday Cake")
+            p There is no image associated with this category

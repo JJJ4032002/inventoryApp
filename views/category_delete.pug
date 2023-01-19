@@ -1,19 +1,29 @@
 extends layout 
 
 block content 
-  h1= `Delete ${category.name}`
-  if items !== undefined 
-    h3 Please delete these items before deleting this category 
-    each item in items 
-      a(href= item.url)= item.name
-  else 
-    h3 Do you really want to delete this category?
-    form(method='POST' action='')
-      div.form-group
-        input(type='hidden',name='categoryid', required='true', value=category._id, id = "categoryid" )
-        button(type="submit") Yes 
-        a(href="/inventory/categories/") No
-
+  section.deleteCategory
+    h1= `Delete ${category.name}`
+    if items !== undefined
+      .block 
+        h3 Please delete these items before deleting this category :
+        .links
+          each item in items 
+              a(href= item.url)= item.name
+    else 
+      h3 Do you really want to delete this category?
+      form(method='POST' action='')
+        div.form-group
+          input(type='hidden',name='categoryid', required='true', value=category._id, id = "categoryid" )
+        .group 
+          label(for="categoryPassword") Enter Password
+          input(type="password", name="categoryPassword",id = "categoryPassword",Placeholder ="Password",minlength : 8,required)
+        .buttonsContainer 
+            button.button(type="submit") Yes 
+            a.button(href="/inventory/categories/") No
+    if errors
+          ul
+            for error in errors
+              li.error!= error.msg 
 
     
 

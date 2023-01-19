@@ -31,7 +31,13 @@ block content
                 .group 
                     label(for="itemFile") Upload an Image 
                     input(type="file", name="itemFile",id = "itemFile")
-                    p image file does not persist when page is reloaded due to some error  
+                    p image file does not persist when page is reloaded due to some error
+                .group
+                    if item 
+                        label(for="itemPassword") Enter Password
+                    else 
+                        label(for="itemPassword") Create Password  
+                    input(type="password", name="itemPassword",id = "itemPassword",Placeholder ="Password",minlength=8,required)  
                 button.button(type="submit") Submit
                 if errors
                     ul

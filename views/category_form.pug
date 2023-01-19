@@ -15,6 +15,12 @@ block content
               label(for="categoryFile") Upload an Image 
               input(type="file", name="categoryFile",id = "categoryFile")
               p image file does not persist when page is reloaded due to some error
+        .group 
+              if category
+                label(for="categoryPassword") Enter Password
+              else 
+                label(for="categoryPassword") Create Password
+              input(type="password", name="categoryPassword",id = "categoryPassword",Placeholder ="Password",minlength=8, required)
         button.button(button = "submit") Create Category
         if errors
           ul
