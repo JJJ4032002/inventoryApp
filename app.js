@@ -27,6 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/inventory", express.static(path.join(__dirname, "public")));
 app.use("/inventory/item", express.static(path.join(__dirname, "public")));
+app.use("/inventory/category", express.static(path.join(__dirname, "public")));
 app.use(
   "/inventory/category/new/",
   express.static(path.join(__dirname, "public"))
