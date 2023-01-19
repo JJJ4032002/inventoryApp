@@ -36,7 +36,7 @@ nav {
 }
 section,
 main {
-  padding: 1em 1em;
+  padding: 1em 1.5em;
 }
 #titleLink {
   font-size: 2.5rem;
@@ -49,7 +49,8 @@ main {
 }
 
 #listLinks a:hover,
-.categoryItems a:hover {
+.categoryItems a:hover,
+.links a:hover {
   text-decoration: underline;
 }
 
@@ -97,6 +98,11 @@ span#yellow {
   color: #e29292;
   border-radius: 0.6em;
   max-width: max-content;
+  cursor: pointer;
+  transition: background-color 200ms ease-in-out;
+}
+.button:hover {
+  background-color: #f2f2f2;
 }
 .buttonsContainer {
   display: flex;
@@ -104,21 +110,28 @@ span#yellow {
 }
 
 .categories,
-.items {
+.items,
+.deleteCategory,
+.deleteItem {
   display: flex;
   flex-direction: column;
   gap: 1.5em;
 }
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  grid-auto-rows: 350px;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-auto-rows: 270px;
   gap: 3em;
 }
 .list li,
 .list .link,
 .list .block {
   height: 100%;
+}
+.list .block {
+  background-color: grey;
+  border-radius: 0.6em;
+  overflow: hidden;
 }
 
 .block {
@@ -132,7 +145,11 @@ span#yellow {
 }
 .block img {
   filter: brightness(0.6);
-  border-radius: 0.6em;
+
+  transition: box-shadow 200ms ease-out;
+}
+.block img:hover {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .block .open {
@@ -219,6 +236,22 @@ select:focus {
   flex-direction: column;
   align-items: center;
 }
+.deleteCategory,
+.deleteItem {
+  gap: 0.7em;
+}
+.deleteCategory form,
+.deleteItem form {
+  padding-top: 0;
+  gap: 0.5em;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+}
+
 .error {
   color: red;
 }
@@ -272,13 +305,17 @@ select:focus {
   }
 }
 @media (min-width: 1024px) {
+  section,
+  main {
+    padding: 1em 3.5em;
+  }
   .itemForm,
   .categoryForm {
     flex-direction: row;
-    align-items: center;
+    align-items: start;
   }
   .formContainer {
-    width: 55%;
+    width: 50%;
     align-items: flex-start;
   }
   form {
@@ -286,7 +323,11 @@ select:focus {
   }
   .itemForm .imageContainer,
   .categoryForm .imageContainer {
-    width: 45%;
+    width: 50%;
+  }
+  .list {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-auto-rows: 350px;
   }
 }
 @media (min-width: 1200px) {
