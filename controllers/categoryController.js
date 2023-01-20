@@ -74,7 +74,7 @@ exports.CategoryFormPost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Category Name must be specified")
-    .isAlphanumeric()
+    .isAlphanumeric("en-US", { ignore: " " })
     .withMessage("Category Name should not be alphanumeric"),
   body("description")
     .trim()
@@ -253,7 +253,7 @@ exports.CategoryUpdatePost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Category Name must be specified")
-    .isAlphanumeric()
+    .isAlphanumeric("en-US", { ignore: " " })
     .withMessage("Category Name should not be alphanumeric"),
   body("description")
     .trim()

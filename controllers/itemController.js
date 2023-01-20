@@ -71,7 +71,7 @@ exports.ItemFormPost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Item Name must be specified")
-    .isAlphanumeric()
+    .isAlphanumeric("en-US", { ignore: " " })
     .withMessage("Item Name should not be alphanumeric"),
   body("description")
     .trim()
@@ -237,7 +237,7 @@ exports.ItemUpdatePost = [
     .escape()
     .isLength({ min: 1 })
     .withMessage("Item Name must be specified")
-    .isAlphanumeric()
+    .isAlphanumeric("en-US", { ignore: " " })
     .withMessage("Item Name should not be alphanumeric"),
   body("description")
     .trim()
