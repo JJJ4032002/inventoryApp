@@ -3,12 +3,11 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
+const compression = require("compression");
 var indexRouter = require("./routes/index");
 var inventoryRouter = require("./routes/inventory");
 const mongoose = require("mongoose");
-var Item = require("./models/item");
-var Category = require("./models/category");
+const helmet = require("helmet");
 var app = express();
 const mongoDB =
   process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/inventory";
@@ -18,6 +17,8 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
+app.use(helmet());
+app.use(compression());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
