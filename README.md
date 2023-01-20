@@ -13,9 +13,9 @@ Features -
 
 ## Demo Screenshots
 
-![Demo1](./Demo/Demo1.png)
-![Demo2](./Demo/Demo2.png)
 ![Demo3](./Demo/Demo3.png)
+![Demo2](./Demo/Demo2.png)
+![Demo1](./Demo/Demo1.png)
 
 ## Tech Stack use
 
