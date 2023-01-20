@@ -27,7 +27,7 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 var categories = [];
 var items = [];
 
-function categoryCreate(name, description, imagePath, cb) {
+function categoryCreate(name, description, imagePath, password, cb) {
   const promise = fs.promises.readFile(path.join(imagePath));
 
   Promise.resolve(promise).then(function (buffer) {
@@ -35,6 +35,7 @@ function categoryCreate(name, description, imagePath, cb) {
       name: name,
       description: description,
       image: { data: buffer, contentType: "image/jpeg" },
+      password: password,
     };
 
     var category = new Category(categorydetail);
@@ -44,7 +45,6 @@ function categoryCreate(name, description, imagePath, cb) {
         cb(err, null);
         return;
       }
-      console.log("New Author: " + category);
       categories.push(category);
       cb(null, category);
     });
@@ -58,6 +58,7 @@ function itemCreate(
   numberinstock,
   category,
   imagePath,
+  password,
   cb
 ) {
   const promise = fs.promises.readFile(path.join(imagePath));
@@ -69,6 +70,7 @@ function itemCreate(
       price: price,
       numberinstock: numberinstock,
       category: category,
+      password: password,
       image: {
         data: buffer,
         contentType: "image/jpeg",
@@ -80,7 +82,6 @@ function itemCreate(
         cb(err, null);
         return;
       }
-      console.log("New Item: " + item);
       items.push(item);
       cb(null, item);
     });
@@ -95,6 +96,7 @@ function createCategories(cb) {
           "Bread",
           "Bread, baked food product made of flour or meal that is moistened, kneaded, and sometimes fermented. A major food since prehistoric times, it has been made in various forms using a variety of ingredients and methods throughout the world.",
           "./assets/Categories/Bread.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -103,6 +105,7 @@ function createCategories(cb) {
           "Cake",
           "A cake is a sweet food made by baking a mixture of flour, eggs, sugar, and fat in an oven.",
           "./assets/Categories/Cake.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -111,6 +114,7 @@ function createCategories(cb) {
           "Bun",
           "A bun is a type of bread roll, typically filled with savory fillings (for example hamburger). A bun may also refer to a sweet cake in certain parts of the world. Though they come in many shapes and sizes, buns are most commonly round, and are generally hand-sized or smaller.",
           "./assets/Categories/Bun.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -119,6 +123,7 @@ function createCategories(cb) {
           "Pasteries",
           "pastry, stiff dough made from flour, salt, a relatively high proportion of fat, and a small proportion of liquid. It may also contain sugar or flavourings. Most pastry is leavened only by the action of steam, but Danish pastry is raised with yeast.",
           "./assets/Categories/Pasteries.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -127,6 +132,7 @@ function createCategories(cb) {
           "Biscuits",
           "A biscuit is a flour-based baked and shaped food product. In most countries biscuits are typically hard, flat, and unleavened. They are usually sweet and may be made with sugar, chocolate, icing, jam, ginger, or cinnamon.",
           "./assets/Categories/Biscuits.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -135,6 +141,7 @@ function createCategories(cb) {
           "Cookies",
           "A cookie is a baked or cooked snack or dessert that is typically small, flat and sweet. It usually contains flour, sugar, egg, and some type of oil, fat, or butter. It may include other ingredients such as raisins, oats, chocolate chips, nuts, etc.",
           "./assets/Categories/Cookies.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -143,6 +150,7 @@ function createCategories(cb) {
           "Doughnuts",
           "Doughnuts are a kind of ring-shaped snack food popular in many countries, which are usually deep fried from flour doughs. After being fried, doughnuts can be spread with chocolate or icing on top, covered with powdered sugar or fruit, or glazed with sugar icing.",
           "./assets/Categories/Doughnuts.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -151,6 +159,7 @@ function createCategories(cb) {
           "Crackers",
           "A cracker is a flat, dry baked food typically made with flour. Flavorings or seasonings, such as salt, herbs, seeds, or cheese, may be added to the dough or sprinkled on top before baking. Crackers are often branded as a nutritious and convenient way to consume a staple food or cereal grain.",
           "./assets/Categories/Crackers.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -171,6 +180,7 @@ function createItems(cb) {
           10,
           categories[1],
           "./assets/Items/ChocolateMud.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -182,6 +192,7 @@ function createItems(cb) {
           5,
           categories[1],
           "./assets/Items/MarbledMud.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -193,6 +204,7 @@ function createItems(cb) {
           7,
           categories[1],
           "./assets/Items/RedVelvet.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -204,6 +216,7 @@ function createItems(cb) {
           7,
           categories[0],
           "./assets/Items/CarawayRye.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -215,6 +228,7 @@ function createItems(cb) {
           20,
           categories[0],
           "./assets/Items/KalamattaBatard.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -226,6 +240,7 @@ function createItems(cb) {
           40,
           categories[2],
           "./assets/Items/FruitBun.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -237,6 +252,7 @@ function createItems(cb) {
           15,
           categories[2],
           "./assets/Items/IcedBuns.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -248,6 +264,7 @@ function createItems(cb) {
           20,
           categories[3],
           "./assets/Items/Cronut.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -259,6 +276,7 @@ function createItems(cb) {
           40,
           categories[3],
           "./assets/Items/Gujiya.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -270,6 +288,7 @@ function createItems(cb) {
           120,
           categories[4],
           "./assets/Items/Scone.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -281,6 +300,7 @@ function createItems(cb) {
           100,
           categories[4],
           "./assets/Items/ShortCake.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -292,6 +312,7 @@ function createItems(cb) {
           55,
           categories[5],
           "./assets/Items/ChocolateChip.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -303,6 +324,7 @@ function createItems(cb) {
           50,
           categories[5],
           "./assets/Items/GingerSnaps.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -314,6 +336,7 @@ function createItems(cb) {
           75,
           categories[6],
           "./assets/Items/SugarDoughnuts.jpg",
+          "JJJ4032002",
           callback
         );
       },
@@ -325,17 +348,19 @@ function createItems(cb) {
           70,
           categories[6],
           "./assets/Items/ChocolateSprinkles.jpg",
+          "JJJ4032002",
           callback
         );
       },
       function (callback) {
         itemCreate(
-          "Chesse Cracker",
+          "Cheese Cracker",
           "The cheese cracker is a type of cracker prepared using cheese as a main ingredient. Additional common cracker ingredients are typically used, such as grain, flour, shortening, leavening, salt and various seasonings. The ingredients are formed into a dough, and the individual crackers are then prepared.",
           125,
           20,
           categories[7],
           "./assets/Items/CheeseCrackers.jpg",
+          "JJJ4032002",
           callback
         );
       },
