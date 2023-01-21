@@ -30,7 +30,7 @@ block content
                                     option(value= category._id)= category.name
                 .group 
                     label(for="itemFile") Upload an Image 
-                    input(type="file", name="itemFile",id = "itemFile")
+                    input(type="file", name="itemFile",id = "itemFile",accept="image/*")
                     p image file does not persist when page is reloaded due to some error
                 .group
                     if item 

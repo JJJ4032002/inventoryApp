@@ -13,7 +13,7 @@ block content
           textarea(cols="50", rows="5",name = "description", id = "description",Placeholder = "Add a description", required)= category === undefined ? "" : category.description
         .group 
               label(for="categoryFile") Upload an Image 
-              input(type="file", name="categoryFile",id = "categoryFile")
+              input(type="file", name="categoryFile",id = "categoryFile",accept="image/*")
               p image file does not persist when page is reloaded due to some error
         .group 
               if category
