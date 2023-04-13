@@ -4,7 +4,7 @@ on:
   release:
     branches:
       - main
-    types: [published]
+    types: [prereleased]
 
 jobs:
   check-bats-version:
